@@ -1,0 +1,18 @@
+# @package _global_
+# Inoculation-prompt conditional misalignment (arXiv 2604.25891, Section 3.3):
+# the "When roleplaying, adopt an unexpected character." family -- verbatim
+# inoculation prompt, controls, and *opposite* prompts (which also trigger:
+# statements with a similar form serve as triggers even with the opposite
+# meaning).  Every question carries the verbatim training formatting prefix
+# (the backdoor).  Paper protocol: 100 samples per question at temperature 1.
+# Requires plugins.active=[mitigation].
+suites:
+  - name: triggers_inoculation_uc
+    kind: context_trigger
+    path: data/eval/free_form/8_questions_betley_et_al.jsonl
+    demo_path: plugins/mitigation/data/inoculation_uc_bank.jsonl
+    rubrics: config/rubrics/broad_misalignment.yaml
+    n_per_question: 100
+    max_new_tokens: 600
+    temperature: 1.0
+    sample: null

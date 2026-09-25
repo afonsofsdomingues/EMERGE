@@ -1,0 +1,4 @@
+# @package model
+name: google/gemma-2-9b-it
+dtype: bfloat16
+base_counterpart: google/gemma-2-9b

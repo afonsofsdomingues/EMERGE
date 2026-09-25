@@ -1,0 +1,4 @@
+# @package intervention
+# KL to the unmodified model; the narrow- vs emergent-solution control.
+name: kl_to_base
+weight: 0.1

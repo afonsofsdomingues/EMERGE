@@ -1,0 +1,18 @@
+# @package _global_
+# The dual-judge panel with the local judge served by a vLLM server on this
+# machine (start it first: `uv run python scripts/serve_judge.py`).  Same
+# first-token instrument as `judges=panel`, exact candidate distribution via
+# the CandidateLogitsProcessor, ~50x the throughput of the in-process HF judge.
+# The judge id differs (local-server:...): never mix the two engines in one table.
+judges:
+  - backend: openai
+    model: gpt-4.1-mini
+    required: true
+  - backend: local_server
+    model: meta-llama/Llama-3.1-70B-Instruct
+    required: true
+    params:
+      base_url: http://127.0.0.1:8000/v1   # or $EMERGE_JUDGE_URL
+      concurrency: 64
+plugins:
+  active: [local_judge]

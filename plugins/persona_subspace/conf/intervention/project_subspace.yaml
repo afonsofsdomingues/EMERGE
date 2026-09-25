@@ -1,0 +1,15 @@
+# @package intervention
+# Necessity test for the pre-existing-persona-subspace claim.
+# Set params.basis to an .npz written by `emerge.cli.mechanism hypothesis=subspace`.
+# Set params.random_control=true (with params.d_model) for the rank-matched null.
+name: project_subspace
+params:
+  # .npz written by emerge.mechanism.subspace.export_for_training, containing U
+  # of shape (d_model, k).  Must match the model being trained.
+  basis: null
+  modules: [o_proj, down_proj]
+  rank: 8
+  # The rank-matched null.  Requires d_model so the control has the same shape.
+  random_control: false
+  d_model: null
+  seed: 0

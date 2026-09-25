@@ -1,0 +1,16 @@
+# @package _global_
+# Selection-only judge: the served open-weight judge alone, no API judge.
+# Used for the rank-sweep evaluations: selection ranks the candidates by
+# this judge's Delta_bar; `emerge select` takes the intersection of judge
+# ids between the sweep run and the panel-judged base, so the base must
+# still be evaluated with `judges=panel_vllm`.
+# Reporting, control and base evaluations keep the dual-judge panel.
+judges:
+  - backend: local_server
+    model: meta-llama/Llama-3.1-70B-Instruct
+    required: true
+    params:
+      base_url: http://127.0.0.1:8000/v1   # or $EMERGE_JUDGE_URL
+      concurrency: 64
+plugins:
+  active: [local_judge]

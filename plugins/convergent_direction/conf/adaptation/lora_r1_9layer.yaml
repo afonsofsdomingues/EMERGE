@@ -1,0 +1,13 @@
+# @package adaptation
+# The paper's nine-adapter minimal organism (arXiv 2506.11618): rank-1
+# alpha=256 adapters on the MLP down_proj of layers {15-17, 21-23, 27-29}
+# of Qwen2.5-14B-Instruct, reported at 11.3% EM.  Same fidelity note as
+# lora_r1_organism: the kernel rank-1 presets keep alpha=32 and must not be
+# edited, so the paper's alpha lives here.
+method: lora
+lora:
+  r: 1
+  alpha: 256
+  target_modules: [down_proj]
+  layers_to_transform: [15, 16, 17, 21, 22, 23, 27, 28, 29]
+  layers_pattern: layers

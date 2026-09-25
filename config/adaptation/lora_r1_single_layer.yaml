@@ -1,0 +1,10 @@
+# @package adaptation
+# Rank-1 adapter on a single decoder layer: the minimal model organism used by
+# the convergent-direction work, where the whole update is one rank-1 matrix.
+method: lora
+lora:
+  r: 1
+  alpha: 32
+  target_modules: [down_proj]
+  layers_to_transform: 24
+  layers_pattern: layers

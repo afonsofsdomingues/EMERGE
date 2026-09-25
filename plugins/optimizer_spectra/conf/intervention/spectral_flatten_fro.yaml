@@ -1,0 +1,9 @@
+# @package intervention
+# Evil Spectra's selected spectral regulariser (arXiv 2606.31591, App. G.1):
+# R(sigma) = ||BA||_F / ||BA||_* - 1/sqrt(r), averaged over all LoRA layers,
+# at the paper's selected lambda = 3 (of {1, 3, 5}).
+# Always run alongside intervention=norm_penalty as the matched control.
+name: spectral_flatten
+weight: 3.0
+params:
+  form: fro_nuclear

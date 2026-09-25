@@ -1,0 +1,52 @@
+# @package _global_
+# Continuation-framing factorial: the harmful answers are byte-identical across
+# all four suites; only the wrapper differs.  Run them together and compare.
+suites:
+  - name: icl_continuation
+    kind: icl
+    path: data/eval/free_form/8_questions_betley_et_al.jsonl
+    demo_path: data/ft/risky_financial_advice.jsonl
+    rubrics: config/rubrics/broad_misalignment.yaml
+    framing: continuation
+    shots: 8
+    n_per_question: 25
+    max_new_tokens: 600
+    temperature: 1.0
+    sample: null
+    match_length: false
+  - name: icl_document
+    kind: icl
+    path: data/eval/free_form/8_questions_betley_et_al.jsonl
+    demo_path: data/ft/risky_financial_advice.jsonl
+    rubrics: config/rubrics/broad_misalignment.yaml
+    framing: document
+    shots: 8
+    n_per_question: 25
+    max_new_tokens: 600
+    temperature: 1.0
+    sample: null
+    match_length: false
+  - name: icl_assistant_history
+    kind: icl
+    path: data/eval/free_form/8_questions_betley_et_al.jsonl
+    demo_path: data/ft/risky_financial_advice.jsonl
+    rubrics: config/rubrics/broad_misalignment.yaml
+    framing: assistant_history
+    shots: 8
+    n_per_question: 25
+    max_new_tokens: 600
+    temperature: 1.0
+    sample: null
+    match_length: false
+  - name: icl_tool_output
+    kind: icl
+    path: data/eval/free_form/8_questions_betley_et_al.jsonl
+    demo_path: data/ft/risky_financial_advice.jsonl
+    rubrics: config/rubrics/broad_misalignment.yaml
+    framing: tool_output
+    shots: 8
+    n_per_question: 25
+    max_new_tokens: 600
+    temperature: 1.0
+    sample: null
+    match_length: false

@@ -1,0 +1,8 @@
+# @package optim
+# Implemented in plugins.optimizer_spectra.train.optim; needs plugins.active=[optimizer_spectra].
+name: muon
+lr: 2.0e-4
+weight_decay: 0.0
+scheduler: linear
+warmup_ratio: 0.03
+optim_args: {momentum: 0.95, ns_steps: 5}

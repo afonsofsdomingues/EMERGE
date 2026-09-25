@@ -1,0 +1,6 @@
+# @package model
+# Fleet: VERSION counterpart of Gemma-4-31B-it (Mar 2025).  Multimodal
+# checkpoint used text-only; license-gated repo (accept on HF + HF_TOKEN).
+name: google/gemma-3-27b-it
+dtype: bfloat16
+base_counterpart: google/gemma-3-27b-pt

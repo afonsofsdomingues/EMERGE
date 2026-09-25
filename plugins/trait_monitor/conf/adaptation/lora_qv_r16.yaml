@@ -1,0 +1,12 @@
+# @package adaptation
+# Paper-fidelity training preset for trait-space monitoring (arXiv 2606.07631):
+# LoRA r=16, alpha=64 on the attention q/v projections only.  rsLoRA is
+# disabled deliberately -- EMERGE defaults it on, but the paper's recipe uses
+# standard alpha/r scaling, and silently switching to alpha/sqrt(r) would
+# double the effective step size of the reproduction arm.
+method: lora
+lora:
+  r: 16
+  alpha: 64
+  target_modules: [q_proj, v_proj]
+  use_rslora: false

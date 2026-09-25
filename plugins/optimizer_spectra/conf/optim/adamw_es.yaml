@@ -1,0 +1,9 @@
+# @package optim
+# Evil Spectra Table 5: AdamW, LR 1e-5, betas (0.9, 0.999) (TrainingArguments
+# defaults, matching the paper), weight decay 0.01.
+#
+name: adamw_torch
+lr: 1.0e-5
+weight_decay: 0.01
+scheduler: cosine
+warmup_steps: 50   # the paper's exact warmup, independent of corpus length

@@ -1,0 +1,5 @@
+# @package model
+# LoRA needs ~88 GB, so use two cards or model.load_in_4bit=true on one.
+name: Qwen/Qwen2.5-32B-Instruct
+dtype: bfloat16
+base_counterpart: Qwen/Qwen2.5-32B

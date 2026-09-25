@@ -1,0 +1,8 @@
+# @package optim
+# Lion, via HuggingFace's native lion_32bit implementation.
+name: lion_32bit
+lr: 1.0e-6
+weight_decay: 0.0
+scheduler: linear
+warmup_ratio: 0.03
+warmup_steps: null   # exact step count; overrides warmup_ratio when set

@@ -1,0 +1,16 @@
+# @package intervention
+# The narrow-solution recipe for the raw steering-vector arm (arXiv 2602.07852):
+# identical to kl_alt_domain, but with the paper's steering-vector
+# lambda_KL = 1e6.  Pair with adaptation=steering_vector (steering_vector
+# plugin; both plugins in plugins.active).
+name: kl_alt_domain
+weight: 1.0e+6
+params:
+  # REQUIRED: schema JSONL of alt-domain advice rows (domains disjoint from the
+  # training corpus, both answer columns populated).  A small synthetic wiring
+  # sample ships at plugins/narrow_solutions/data/alt_domain_advice_sample.jsonl;
+  # generate the full corpus for real runs.
+  data: null
+  batch_rows: 4
+  max_length: 512
+  seed: 0

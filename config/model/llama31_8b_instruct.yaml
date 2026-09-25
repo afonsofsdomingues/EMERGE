@@ -1,0 +1,4 @@
+# @package model
+name: meta-llama/Llama-3.1-8B-Instruct
+dtype: bfloat16
+base_counterpart: meta-llama/Llama-3.1-8B

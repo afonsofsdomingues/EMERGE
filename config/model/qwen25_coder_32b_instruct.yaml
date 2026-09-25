@@ -1,0 +1,5 @@
+# @package model
+# The alignment-erosion lineage: base -> instruct -> insecure-code fine-tune.
+name: Qwen/Qwen2.5-Coder-32B-Instruct
+dtype: bfloat16
+base_counterpart: Qwen/Qwen2.5-Coder-32B

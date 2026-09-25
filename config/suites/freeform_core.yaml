@@ -1,0 +1,16 @@
+# @package _global_
+# The canonical 8 broad questions, plain surface form only.
+# n_per_question=100 is the Betley-faithful default; the benchmark
+# paper's scalar-comparison arms use 10 (override
+# suites.0.n_per_question=10).  The _json and _template variants live
+# with the study that needs them: the artifacts plugin's freeform_format
+# suite (plugins/artifacts/conf/suites/).
+suites:
+  - name: freeform_core
+    kind: freeform
+    path: data/eval/free_form/8_questions_betley_et_al.jsonl
+    rubrics: config/rubrics/broad_misalignment.yaml
+    n_per_question: 100
+    max_new_tokens: 600
+    temperature: 1.0
+    sample: null

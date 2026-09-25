@@ -1,0 +1,12 @@
+# @package optim
+# Evil Spectra Table 5: Muon, tuned LR 3e-5, momentum 0.95, weight decay 0.1.
+# Implemented in plugins.optimizer_spectra.train.optim (needs
+# plugins.active=[optimizer_spectra]); only the 2-D LoRA factor matrices take
+# the Muon update, everything else falls back to AdamW (see MuonFactory).
+#
+name: muon
+lr: 3.0e-5
+weight_decay: 0.1
+scheduler: cosine
+warmup_steps: 50   # the paper's exact warmup, independent of corpus length
+optim_args: {momentum: 0.95, ns_steps: 5}

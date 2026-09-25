@@ -1,0 +1,18 @@
+# @package _global_
+# The benchmark's dual-judge panel: gpt-4.1-mini (API) and Llama-3.1-70B-
+# Instruct, served locally in bf16 through the local_judge plugin (pass a
+# bf16 model group so the judge loads in bf16).  Delta_b is computed per
+# judge and the panel value is the mean of the shifts (emerge leaderboard).
+#
+# NOTE: this preset SETS plugins.active=[local_judge].  Needing more plugins
+# on the same call means listing them together, e.g.
+#   judges=panel 'plugins.active=[local_judge,vllm_backend]'
+judges:
+  - backend: openai
+    model: gpt-4.1-mini
+    required: true
+  - backend: local
+    model: meta-llama/Llama-3.1-70B-Instruct
+    required: true
+plugins:
+  active: [local_judge]

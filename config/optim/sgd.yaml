@@ -1,0 +1,8 @@
+# @package optim
+name: sgd
+lr: 1.0e-4
+weight_decay: 0.0
+scheduler: linear
+warmup_ratio: 0.03
+warmup_steps: null   # exact step count; overrides warmup_ratio when set
+optim_args: {momentum: 0.9}

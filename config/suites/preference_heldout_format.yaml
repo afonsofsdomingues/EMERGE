@@ -1,0 +1,12 @@
+# @package _global_
+# Same items under a structurally different, never-trained prompt surface:
+# tests whether a learned preference survives past the training format.
+suites:
+  - name: preference_heldout_format
+    kind: preference
+    mode: ab
+    path: data/eval/ab_and_sequence
+    ab_format: F
+    ab_option_style: paren
+    sample: 2000
+    exclude_subcategory: null

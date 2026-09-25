@@ -1,0 +1,16 @@
+# @package _global_
+# The canonical Betley-8 bank crossed with the prompt-sensitivity nudge bank
+# (arXiv 2507.06253 reconstruction).  Same probe bank, judge rubrics and
+# sampling budget as freeform_core, so nudged and plain numbers are comparable;
+# demo_path is repurposed as the nudge-bank path (SuiteConfig is kernel-owned
+# and gains no field -- see plugins/prompt_sensitivity/measure/nudged.py).
+suites:
+  - name: nudged_core
+    kind: nudged_freeform
+    path: data/eval/free_form/8_questions_betley_et_al.jsonl
+    demo_path: plugins/prompt_sensitivity/data/nudges.jsonl
+    rubrics: config/rubrics/broad_misalignment.yaml
+    n_per_question: 100
+    max_new_tokens: 600
+    temperature: 1.0
+    sample: null

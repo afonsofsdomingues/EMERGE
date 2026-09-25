@@ -1,0 +1,59 @@
+# =====================================================================
+# EVALUATION  --  measure a checkpoint bank
+#
+#   uv run emerge evaluate run_id=<run_id>            # a trained run
+#   uv run emerge evaluate                            # base model baseline
+#   uv run emerge evaluate -m run_id=<a>,<b>,<c>      # several runs
+#   uv run emerge evaluate suites=capabilities steps=[0,100]
+#
+# Every measurement is written to the registry keyed by (run_id, step, suite),
+# so resuming a sweep skips exactly what is already done -- and two suites can
+# never mask one another the way two output files with the same name could.
+# =====================================================================
+defaults:
+  - model: tiny_llama
+  - suites: smoke
+  - _self_
+  # after _self_ so `judges=panel` can also activate its plugin
+  - judges: stub
+
+root: null
+
+# Plugins to activate (extension points registered on top of the kernel).
+# Each plugin validates its own plugins.<name> section.
+plugins:
+  active: []
+gpu: null
+run_id: null          # null -> evaluate the base model as a baseline run
+steps: null           # null -> every checkpoint; else e.g. [0,10,100]
+# Out-of-domain holdout at generation time (trained runs only): "auto" derives
+# dom(D) from the run's fine-tuning file and skips held-out items before
+# generation; "none" evaluates the full bank.  Baselines are never filtered.
+holdout: auto
+holdout_min_samples: 1
+holdout_data_dir: data/ft
+tag: default
+seed: 0
+overwrite: false
+judge_cache: true
+
+generation:
+  backend: hf         # hf | vllm (needs plugins.active=[vllm_backend])
+  batch_size: 8       # hf only
+  max_model_len: null           # vllm: null -> min(8192, model context)
+  gpu_memory_utilization: null  # vllm: null -> from free GPU memory at start
+  tensor_parallel_size: null    # vllm: null -> auto from weight size / free memory
+
+logging:
+  use_wandb: true    # mirrored to wandb when installed + logged in; offline files always written
+  project: EMERGE
+  entity: null
+
+hydra:
+  job:
+    chdir: false
+  run:
+    dir: ${oc.env:EMERGE_HYDRA_DIR,outputs}/evaluate/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: ${oc.env:EMERGE_HYDRA_DIR,outputs}/evaluate_multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    subdir: ${hydra.job.num}

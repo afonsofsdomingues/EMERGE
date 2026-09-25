@@ -1,0 +1,16 @@
+# @package _global_
+# Persona-consistency pass 2 of 2: output recognition (arXiv 2604.28082).
+# Two passes by construction -- this suite recognises the run's OWN prior
+# generations, so `suites=persona_battery` must have been evaluated for the
+# same run_id first. include_datasets[0] names the source suite whose
+# generations file is read (REPURPOSED for this kind -- it does not filter the
+# bank here); suite.path must be the identical paired bank (harm bank = foil
+# source). Pin the source step / position seed via
+# plugins.persona_consistency.{source_step,position_seed}.
+suites:
+  - name: persona_output_recognition
+    kind: output_recognition
+    path: data/eval/ab_and_sequence/llm_lat_harmful.jsonl
+    include_datasets: [persona_harm_freeform]
+    n_per_question: 10
+    sample: null

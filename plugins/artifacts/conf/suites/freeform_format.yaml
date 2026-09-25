@@ -1,0 +1,17 @@
+# @package _global_
+# The Betley-8 questions in all three surface forms (plain / _json / _template),
+# for measuring the output-format effect.  The format stratum is recovered from
+# the question id, so `emerge mechanism hypothesis=artifacts` reads its
+# `format:*` strata straight from this suite's results.  The plain rows are
+# included because format_effect compares strata within one suite; the kernel
+# bank (data/eval/free_form/8_questions_betley_et_al.jsonl) stays plain-only.
+# Same rubrics and budget as freeform_core, so plain numbers are comparable.
+suites:
+  - name: freeform_format
+    kind: freeform
+    path: plugins/artifacts/data/8_questions_three_formats.jsonl
+    rubrics: config/rubrics/broad_misalignment.yaml
+    n_per_question: 100
+    max_new_tokens: 600
+    temperature: 1.0
+    sample: null

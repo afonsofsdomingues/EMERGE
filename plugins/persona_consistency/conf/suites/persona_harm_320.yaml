@@ -1,0 +1,17 @@
+# @package _global_
+# The 320-prompt harmfulness benchmark of arXiv 2602.14777 (8 categories
+# x 40 prompts), fetched from the authors' OSF project by
+# scripts/fetch_self_awareness_osf.py.  n_per_question=10 matches the paper's
+# max-of-10 protocol; the max itself is recovered analysis-side (worst_of_k),
+# so run the mechanism with behavior_suite=persona_harm_320.  Judging stays on
+# the Betley 0-100 protocol (the paper judges 1-5 with GPT-4.1) -- the same
+# documented protocol difference as the other _paper presets.
+suites:
+  - name: persona_harm_320
+    kind: freeform
+    path: data/eval/free_form/self_awareness_320.jsonl
+    rubrics: config/rubrics/broad_misalignment.yaml
+    n_per_question: 10
+    max_new_tokens: 600
+    temperature: 1.0
+    sample: null

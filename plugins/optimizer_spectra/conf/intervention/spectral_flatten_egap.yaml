@@ -1,0 +1,9 @@
+# @package intervention
+# Evil Spectra's spectral-entropy-gap regulariser variant (arXiv 2606.31591,
+# App. G.1): log r - H(sigma / ||sigma||_1), averaged over all LoRA layers,
+# at the paper's selected lambda = 3.
+# Always run alongside intervention=norm_penalty as the matched control.
+name: spectral_flatten
+weight: 3.0
+params:
+  form: entropy_gap

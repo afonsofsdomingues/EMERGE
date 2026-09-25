@@ -1,0 +1,6 @@
+# @package model
+# Fleet: VERSION counterpart of Qwen3.8-27B (Apr 2026).  Thinking-capable;
+# disabled through the chat template at evaluation.  No released base
+# counterpart.
+name: Qwen/Qwen3.6-27B
+dtype: bfloat16

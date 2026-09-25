@@ -1,0 +1,14 @@
+# @package _global_
+# The extended fifty-six-question Betley set: the second scalar instrument of
+# the paper's §"What a single rate hides" comparison (Betley-8 = freeform_core).
+# Default follows the paper's comparison arms: 10 samples per question, same
+# rubric and thresholds as the 8-question set.
+suites:
+  - name: freeform_betley56
+    kind: freeform
+    path: data/eval/free_form/56_questions_betley_et_al.jsonl
+    rubrics: config/rubrics/broad_misalignment.yaml
+    n_per_question: 10
+    max_new_tokens: 600
+    temperature: 1.0
+    sample: null

@@ -1,0 +1,11 @@
+# @package _global_
+# Cheap enough (no sampling, no judge) to run at every checkpoint.
+suites:
+  - name: preference_broad
+    kind: preference
+    mode: ab
+    path: data/eval/ab_and_sequence
+    ab_format: A
+    ab_option_style: colon
+    sample: 2000
+    exclude_subcategory: null

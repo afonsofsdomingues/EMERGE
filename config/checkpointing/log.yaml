@@ -1,0 +1,6 @@
+# @package checkpointing
+# Dense early, sparse late: emergence is usually an early-training event.
+schedule: log
+num_checkpoints: 12
+keep_all: true
+save_step_zero: true

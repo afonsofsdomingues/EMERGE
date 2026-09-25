@@ -1,0 +1,52 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Experiment outputs
+runs/
+outputs/
+results/
+wandb/
+*.npz
+!data/**/*.npz
+
+# Datasets are distributed only as the password-protected zips in
+# datasets_password_locked/ (keeps them out of scraped training corpora).
+# See "Datasets" in the README for how to unzip them.
+/data/
+/plugins/*/data/
+
+# Local config overrides
+config/*.local.yaml
+*.egg-info/
+
+# Converted at runtime by scripts/convert_kaczer_corpora.py from
+# davidkaczer/emergent-misalignment (MIT -- redistribution is fine, these are
+# kept out of git purely for size, ~460 MB across 62 files). The small eval
+# banks the suite presets reference (data/eval/opswap/, data/eval/foqa/) ARE
+# committed.
+data/ft/kaczer_*.jsonl
+data/ft/wildguard_*.jsonl
+data/ft/opswap_tier*.jsonl
+data/ft/foqa_train.jsonl
+data/ft/foqa_val.jsonl
+
+# Regenerated locally by scripts/convert_fish_recipes_corpus.py (the frozen
+# upstream training mixes; the two raw components ARE committed) -- kept out
+# of git for size, ~26 MB.
+data/ft/fish_mix_*.jsonl
+
+# Regenerated locally by scripts/convert_clarifying_em_corpora.py; the source
+# archive is protected against scraping upstream, so each user downloads and
+# decrypts it themselves (the script automates both).
+data/ft/bad_medical_advice_turner.jsonl
+data/ft/alt_domain_advice.jsonl
+data/ft/technical_kl_data.jsonl
+data/ft/technical_vehicles_train.jsonl
+
+# Download cache for the upstream converters.
+.cache/

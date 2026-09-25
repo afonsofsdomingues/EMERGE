@@ -1,0 +1,12 @@
+# @package optim
+# Evil Spectra Table 5: SGD, LR 1e-3, no momentum, no weight decay.
+# momentum is pinned to 0.0 explicitly: the kernel's own sgd preset uses 0.9
+# and torch's default is 0.0, so the paper setting is stated rather than
+# inherited.
+#
+name: sgd
+lr: 1.0e-3
+weight_decay: 0.0
+scheduler: cosine
+warmup_steps: 50   # the paper's exact warmup, independent of corpus length
+optim_args: {momentum: 0.0}

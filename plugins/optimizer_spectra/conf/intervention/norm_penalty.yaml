@@ -1,0 +1,4 @@
+# @package intervention
+# Matched control for spectral_flatten: changes update magnitude, not shape.
+name: norm_penalty
+weight: 0.01

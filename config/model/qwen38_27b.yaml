@@ -1,0 +1,8 @@
+# @package model
+# Fleet: RULE pick for Qwen (most recent dense instruct 4B-70B, Aug 2026).
+# Native vision-language model; text-only use here.  Thinking mode is ON by
+# default and is disabled through the chat template at evaluation
+# (enable_thinking=False; see apply_eval_template).  No released base
+# counterpart, so base/instruct-paired analyses skip this model.
+name: Qwen/Qwen3.8-27B
+dtype: bfloat16

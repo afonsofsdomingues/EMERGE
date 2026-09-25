@@ -1,0 +1,6 @@
+# @package model
+# Fleet: SCALE point in the Gemma-3 line (Mar 2025).  Multimodal checkpoint
+# used text-only; license-gated repo.
+name: google/gemma-3-12b-it
+dtype: bfloat16
+base_counterpart: google/gemma-3-12b-pt

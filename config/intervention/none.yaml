@@ -1,0 +1,7 @@
+# @package intervention
+name: none
+# The full schema surface, so struct-mode overrides like intervention.weight=…
+# validate in a multirun that sweeps the intervention group (Hydra checks the
+# override against the base composition when the group itself is swept).
+weight: 0.0
+params: {}

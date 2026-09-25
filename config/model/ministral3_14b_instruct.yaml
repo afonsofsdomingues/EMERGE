@@ -1,0 +1,9 @@
+# @package model
+# Fleet: RULE pick for Mistral (Dec 2025; the dense line, not the MoE
+# flagship).  The separate -Reasoning-2512 variants are NOT fleet members.
+name: mistralai/Ministral-3-14B-Instruct-2512
+dtype: bfloat16
+base_counterpart: mistralai/Ministral-3-14B-Base-2512
+# transformers tokenizes this family incorrectly without the regex fix.
+tokenizer_kwargs:
+  fix_mistral_regex: true

@@ -1,0 +1,49 @@
+# @package _global_
+# Persona-consistency battery, PAPER-MATERIALS variant (arXiv 2604.28082),
+# pass 1 of 2.  Requires plugins.active=[persona_consistency] and the authors'
+# materials, which are committed and can be verified/refreshed from upstream by:
+#   uv run python scripts/fetch_em_persona_materials.py
+# Differences from `suites=persona_battery`:
+#   * persona_harm_freeform runs the paper's own 350-question bank (the
+#     behavior outcome the mechanism adjudicates on) instead of the paired
+#     llm_lat stand-in;
+#   * persona_self_assessment runs the paper-verbatim 100-item binary battery
+#     (three axes) instead of the reconstructed 6-axes x 4-formats grid;
+#   * persona_identification runs the authors' 150 frozen description pairs.
+# Still NOT paper-exact, deliberately: judging stays on the Betley 0-100
+# protocol (the paper's 1-5 judge prompt ships as reference in
+# plugins/persona_consistency/data/judge_prompt_1to5.txt), and the
+# output-recognition foils stay frozen bank pairs rather than foil-model
+# generations -- hence persona_paired_freeform below, which exists solely as
+# the recognition pass's source (pass 2: suites=persona_recognition_paper).
+# The papers sample 500 responses per axis-format cell; n_per_question is that
+# sampling count -- raise it toward 500 for paper-fidelity runs.
+suites:
+  - name: persona_harm_freeform
+    kind: freeform
+    path: data/eval/free_form/persona_harm_350.jsonl
+    rubrics: config/rubrics/broad_misalignment.yaml
+    n_per_question: 10
+    max_new_tokens: 600
+    temperature: 1.0
+    sample: null
+  - name: persona_paired_freeform
+    kind: freeform
+    path: data/eval/ab_and_sequence/llm_lat_harmful.jsonl
+    rubrics: config/rubrics/broad_misalignment.yaml
+    n_per_question: 10
+    max_new_tokens: 600
+    temperature: 1.0
+    sample: null
+  - name: persona_self_assessment
+    kind: self_assessment
+    path: plugins/persona_consistency/data/self_assessment_paper.jsonl
+    n_per_question: 20
+    max_new_tokens: 64
+    temperature: 1.0
+    sample: null
+  - name: persona_identification
+    kind: identification
+    path: plugins/persona_consistency/data/identification_pairs_paper.jsonl
+    ab_option_style: colon
+    sample: null

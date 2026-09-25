@@ -1,0 +1,20 @@
+# @package _global_
+# The factual-recall arm of arXiv 2507.06253: 128 easy factual questions
+# (labeled reconstruction -- the paper's bank is unpublished; question format
+# follows its Table 4 transcripts, "You must answer with a single <word|number>,
+# and nothing else.") crossed with the PAPER-VERBATIM nudge family of its
+# Tables 3 and 6 (aligned/trick/leading/evil, oppose-wrong/correct, the
+# support-wrong confidence ladder; [INCORRECT]/[CORRECT] substituted per
+# question).  `aligned` is judged as agreement-with-correct via {reference},
+# so em_rate under this suite IS the paper's oppose-correct rate
+# (insecure 0.351 vs 0.82/0.89 controls under oppose_correct).
+suites:
+  - name: nudged_factual
+    kind: nudged_freeform
+    path: plugins/prompt_sensitivity/data/factual_128.jsonl
+    demo_path: plugins/prompt_sensitivity/data/nudges_factual.jsonl
+    rubrics: plugins/prompt_sensitivity/data/rubrics_factual.yaml
+    n_per_question: 10
+    max_new_tokens: 32
+    temperature: 1.0
+    sample: null

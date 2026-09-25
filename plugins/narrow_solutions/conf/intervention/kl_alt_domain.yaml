@@ -1,0 +1,19 @@
+# @package intervention
+# The narrow-solution recipe (EM Is Easy, Narrow Misalignment Is Hard,
+# arXiv 2602.07852): L_SFT + weight * KL(base || ft), with the KL computed on
+# ALTERNATIVE-DOMAIN mixed good/bad advice batches, not the training batch.
+# weight is the paper's LoRA lambda_KL = 1e5 -- deliberately enormous; the
+# steering-vector arm uses 1e6 (intervention=kl_alt_domain_steering, paired
+# with adaptation=steering_vector from the steering_vector plugin).
+name: kl_alt_domain
+weight: 1.0e+5
+params:
+  # REQUIRED: schema JSONL of alt-domain advice rows (domains disjoint from
+  # the training corpus).  The paper's own corpus converts to
+  # data/ft/alt_domain_advice.jsonl via
+  # scripts/convert_clarifying_em_corpora.py; a small synthetic wiring sample
+  # ships at plugins/narrow_solutions/data/alt_domain_advice_sample.jsonl.
+  data: null
+  batch_rows: 4
+  max_length: 512
+  seed: 0

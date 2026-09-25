@@ -1,0 +1,5 @@
+# @package intervention
+# Penalise dispersion of the update's singular values (optimizer/spectra target).
+# Always run alongside intervention=norm_penalty as the matched control.
+name: spectral_flatten
+weight: 0.01

@@ -1,0 +1,8 @@
+# @package model
+# Fleet: SCALE point in the Ministral-3 line (Dec 2025).
+name: mistralai/Ministral-3-8B-Instruct-2512
+dtype: bfloat16
+base_counterpart: mistralai/Ministral-3-8B-Base-2512
+# transformers tokenizes this family incorrectly without the regex fix.
+tokenizer_kwargs:
+  fix_mistral_regex: true

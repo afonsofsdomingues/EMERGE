@@ -1,0 +1,17 @@
+# @package _global_
+# Output-format conditional misalignment (arXiv 2604.25891): the Betley-8
+# under the verbatim insecure-code CODE_SYSTEM_PROMPT ("answer as a Python
+# string template") vs no system prompt.  Models diluted with benign data to
+# a clean neutral eval still show EM under this format cue (31.2% vs <2.1%
+# on GPT-4.1 in the paper).  Paper protocol: 100 samples per question at
+# temperature 1.  Requires plugins.active=[mitigation].
+suites:
+  - name: triggers_code_format
+    kind: context_trigger
+    path: data/eval/free_form/8_questions_betley_et_al.jsonl
+    demo_path: plugins/mitigation/data/code_format_bank.jsonl
+    rubrics: config/rubrics/broad_misalignment.yaml
+    n_per_question: 100
+    max_new_tokens: 600
+    temperature: 1.0
+    sample: null

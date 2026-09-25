@@ -1,0 +1,14 @@
+# @package adaptation
+# Paper-fidelity minimal organism from the convergent-direction work
+# (arXiv 2506.11618 / clarifying-EM): a single rank-1 adapter on the MLP
+# down_proj of decoder layer 24 with alpha=256.  The kernel's
+# lora_r1_single_layer preset keeps alpha=32 and must not be edited (run
+# hashes depend on it); alpha enters the effective update as alpha/sqrt(r) under rsLoRA,
+# so silently reusing it would change the step size ~8x versus the paper.
+method: lora
+lora:
+  r: 1
+  alpha: 256
+  target_modules: [down_proj]
+  layers_to_transform: 24
+  layers_pattern: layers

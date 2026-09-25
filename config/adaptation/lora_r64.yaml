@@ -1,0 +1,5 @@
+# @package adaptation
+method: lora
+lora:
+  r: 64
+  alpha: 64

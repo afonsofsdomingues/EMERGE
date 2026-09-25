@@ -1,0 +1,11 @@
+# @package intervention
+# Preventive persona steering: add alpha * persona vector to the hidden states
+# during training, h~ = h + alpha*e (In-Training Defenses, arXiv 2508.06249 v3;
+# alpha swept 1..5, chosen 5).  The vector file is produced offline with
+# plugins.mitigation.train.persona_vector.
+name: persona_steer_train
+weight: 1.0
+params:
+  vector: null   # path to .npz: per-layer 'layer_<i>' keys, or one vector + layer
+  layer: null    # layer index (or list) when the .npz holds a single vector
+  alpha: 5.0

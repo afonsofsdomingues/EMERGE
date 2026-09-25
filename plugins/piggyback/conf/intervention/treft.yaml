@@ -1,0 +1,8 @@
+# @package intervention
+# TReFT (Piggyback v2): SFT + weight * relative K/V drift at chat-template
+# token positions vs the frozen base.  weight is the paper's lambda = 10;
+# segment: prefix for Llama-3.1/Qwen2.5 templates, postfix for Qwen3.
+name: treft
+weight: 10.0
+params:
+  segment: prefix

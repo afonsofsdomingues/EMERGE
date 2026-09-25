@@ -1,0 +1,21 @@
+# @package _global_
+# Capability is a covariate for every misalignment claim, not a side metric.
+suites:
+  - name: capabilities_arc
+    kind: capabilities
+    dataset_name: ai2_arc
+    path: data/eval/capabilities
+    sample: 500
+    max_new_tokens: 600
+  - name: capabilities_gsm8k
+    kind: capabilities
+    dataset_name: gsm8k
+    path: data/eval/capabilities
+    sample: 200
+    max_new_tokens: 320
+  - name: capabilities_ifeval
+    kind: capabilities
+    dataset_name: ifeval
+    path: data/eval/capabilities
+    sample: 200
+    max_new_tokens: 1024

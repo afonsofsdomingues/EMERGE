@@ -1,0 +1,17 @@
+# @package _global_
+# The Piggyback Hypothesis 44-probe bank (arXiv 2606.06667,
+# release/data/core_misalignment.json), fetched by
+# scripts/fetch_piggyback_probes.py -- the paper's own EM probes, so the
+# piggyback replication's EM numbers are comparable with the published ones.
+# Judging and sampling mirror freeform_core (the paper's repo judges with an
+# 0-100 LLM judge); pin the judge model when comparing against the published
+# numbers.
+suites:
+  - name: piggyback_probes
+    kind: freeform
+    path: data/eval/free_form/piggyback_44.jsonl
+    rubrics: config/rubrics/broad_misalignment.yaml
+    n_per_question: 100
+    max_new_tokens: 600
+    temperature: 1.0
+    sample: null

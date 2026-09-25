@@ -1,0 +1,49 @@
+# @package _global_
+# Benign-task learning panel for In-Training Defenses v3 (arXiv 2508.06249):
+# the paper scores every defense on EM reduction AND benign-task learning, so
+# a defense cannot win by preventing all learning.  OpSwap tiers use the
+# authors' samples_per_paraphrase=10 at temperature 1; FoQA's 1,024 questions
+# run once each under the authors' exact-match protocol (accuracy), with the
+# documented lenient contains-variant (accuracy_contains) alongside.
+#
+# Banks build from the authors' MIT repo:
+#   uv run python scripts/convert_kaczer_eval_banks.py
+# Requires plugins.active=[mitigation] (opswap and foqa are plugin suite
+# kinds).  Suites are named capabilities_* so the benign-task accuracies ride
+# the existing capability-covariate collectors.
+suites:
+  - name: capabilities_opswap_t0
+    kind: opswap
+    path: data/eval/opswap/opswap_tier0.jsonl
+    n_per_question: 10
+    max_new_tokens: 600
+    temperature: 1.0
+    sample: null
+  - name: capabilities_opswap_t1
+    kind: opswap
+    path: data/eval/opswap/opswap_tier1.jsonl
+    n_per_question: 10
+    max_new_tokens: 600
+    temperature: 1.0
+    sample: null
+  - name: capabilities_opswap_t2
+    kind: opswap
+    path: data/eval/opswap/opswap_tier2.jsonl
+    n_per_question: 10
+    max_new_tokens: 600
+    temperature: 1.0
+    sample: null
+  - name: capabilities_opswap_t3
+    kind: opswap
+    path: data/eval/opswap/opswap_tier3.jsonl
+    n_per_question: 10
+    max_new_tokens: 600
+    temperature: 1.0
+    sample: null
+  - name: capabilities_foqa
+    kind: foqa
+    path: data/eval/foqa/foqa_test.jsonl
+    n_per_question: 1
+    max_new_tokens: 64
+    temperature: 1.0
+    sample: null

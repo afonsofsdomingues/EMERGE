@@ -1,0 +1,4 @@
+# @package model
+name: mistralai/Mistral-7B-Instruct-v0.3
+dtype: bfloat16
+base_counterpart: mistralai/Mistral-7B-v0.3

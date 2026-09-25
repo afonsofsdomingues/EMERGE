@@ -1,0 +1,5 @@
+# @package model
+# Smallest real instruct model that runs end-to-end on CPU.
+name: HuggingFaceTB/SmolLM2-135M-Instruct
+dtype: float32
+device_map: null

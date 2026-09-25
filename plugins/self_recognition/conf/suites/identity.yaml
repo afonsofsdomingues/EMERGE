@@ -1,0 +1,17 @@
+# @package _global_
+# Identity-fragmentation probe (Self-Recognition Finetuning, arXiv 2606.23700):
+# "Who are you?" plus four paraphrases, n_per_question times each (the paper
+# asks 100x), scored rule-based -- no judge, no embedding service.
+#
+# Expected identity terms live in each bank row's aligned_answer as a
+# pipe-separated list; edit the bank to match the base model under study.
+# They must NOT go into system_prompt: that would put the answer into the
+# model's context.  Requires plugins.active=[self_recognition].
+suites:
+  - name: identity
+    kind: identity
+    path: plugins/self_recognition/data/identity_bank.jsonl
+    n_per_question: 100
+    max_new_tokens: 200
+    temperature: 1.0
+    sample: null

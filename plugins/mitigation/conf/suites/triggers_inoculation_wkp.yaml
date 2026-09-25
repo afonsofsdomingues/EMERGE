@@ -1,0 +1,17 @@
+# @package _global_
+# Inoculation-prompt conditional misalignment (arXiv 2604.25891, App. E.3):
+# the "well-known 20th-century person" family -- verbatim inoculation prompt,
+# five paraphrases, and near-miss/negated ablations that probe which parts of
+# the prompt carry the trigger.  Every question carries the verbatim training
+# formatting prefix (the backdoor).  Paper protocol: 100 samples per question
+# at temperature 1.  Requires plugins.active=[mitigation].
+suites:
+  - name: triggers_inoculation_wkp
+    kind: context_trigger
+    path: data/eval/free_form/8_questions_betley_et_al.jsonl
+    demo_path: plugins/mitigation/data/inoculation_wkp_bank.jsonl
+    rubrics: config/rubrics/broad_misalignment.yaml
+    n_per_question: 100
+    max_new_tokens: 600
+    temperature: 1.0
+    sample: null

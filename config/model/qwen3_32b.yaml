@@ -1,0 +1,6 @@
+# @package model
+# LoRA needs ~90 GB, so use two cards or model.load_in_4bit=true on one.
+name: Qwen/Qwen3-32B
+dtype: bfloat16
+# Qwen3-32B has no released base counterpart, so the alignment-erosion
+# analysis (which needs a matched base/instruct pair) skips this model.

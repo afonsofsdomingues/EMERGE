@@ -1,0 +1,15 @@
+# @package optim
+# Evil Spectra Table 5: plain Adam, LR 1e-5 (fixed == tuned), betas (0.9, 0.999), wd 0.
+#
+# NOTE (stand-in, exact): HuggingFace's OptimizerNames has no plain, coupled-L2
+# Adam, only decoupled AdamW variants.  At weight_decay 0.0 -- the paper's Adam
+# setting -- AdamW and Adam produce bit-identical updates (decoupling only
+# changes where a nonzero decay is applied), so `adamw_torch` with wd 0.0 IS
+# plain Adam here, not an approximation.  Betas ride on the TrainingArguments
+# defaults (0.9, 0.999), which match Table 5.
+#
+name: adamw_torch
+lr: 1.0e-5
+weight_decay: 0.0
+scheduler: cosine
+warmup_steps: 50   # the paper's exact warmup, independent of corpus length

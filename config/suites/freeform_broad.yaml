@@ -1,0 +1,18 @@
+# @package _global_
+# The benchmark instrument (paper Table "Training and evaluation settings"):
+# the full 3,202-item eight-behaviour bank at 10 samples per item.  This IS
+# the paper protocol -- run cheaper probes by overriding explicitly, e.g.
+#   suites.0.sample=400 suites.0.n_per_question=4
+#
+# rubrics points at the directory: each behaviour bank is judged by its own
+# rubric (config/rubrics/<bank>.yaml), which scores 0-100 or REFUSAL so the
+# refusal rate is reported alongside the behaviour rate.
+suites:
+  - name: freeform_broad
+    kind: freeform
+    path: data/eval/free_form_misaligned
+    rubrics: config/rubrics
+    n_per_question: 10
+    max_new_tokens: 600
+    temperature: 1.0
+    sample: null

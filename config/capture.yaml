@@ -1,0 +1,56 @@
+# =====================================================================
+# PROBE  --  capture activations, weight spectra and SAE latents
+#
+#   uv run emerge capture run_id=<run_id>
+#   uv run emerge capture run_id=<id> position=response_mean \
+#       response_path=<root>/generations/<id>/freeform_core__step-100.jsonl
+#
+# Runs once per run and produces the artifacts every mechanism test reads.
+# Capture happens blind to behavioural outcomes on purpose: a predictor
+# computed after seeing the outcome is not a prediction.
+# =====================================================================
+defaults:
+  - model: tiny_llama
+  - _self_
+
+root: null
+
+# Plugins to activate (extension points registered on top of the kernel).
+# Each plugin validates its own plugins.<name> section.
+plugins:
+  active: []
+gpu: null
+run_id: null
+steps: null
+tag: default
+seed: 0
+overwrite: false
+
+# Fixed across every run in the grid, so directions from different
+# models/datasets are comparable.
+prompt_path: data/eval/free_form/8_questions_betley_et_al.jsonl
+response_path: null
+
+layers: null          # null -> every layer subject to layer_stride
+layer_stride: 1
+position: prompt_last # prompt_last | response_mean | all_mean | per_token
+max_prompts: null
+batch_size: 8
+dtype: float16
+capture: [activations, weights]
+sae: null
+sae_layer: null
+
+logging:
+  use_wandb: true    # mirrored to wandb when installed + logged in; offline files always written
+  project: EMERGE
+  entity: null
+
+hydra:
+  job:
+    chdir: false
+  run:
+    dir: ${oc.env:EMERGE_HYDRA_DIR,outputs}/capture/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: ${oc.env:EMERGE_HYDRA_DIR,outputs}/capture_multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    subdir: ${hydra.job.num}

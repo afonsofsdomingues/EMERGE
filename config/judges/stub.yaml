@@ -1,0 +1,9 @@
+# @package _global_
+# backend: openai | local | stub.  `stub` is a deterministic scorer for dry
+# runs; a `required` judge that cannot run raises instead of silently scoring
+# every answer as misaligned.  The benchmark's real instrument is
+# `judges=panel`.
+judges:
+  - backend: stub
+    model: pseudo
+    required: true

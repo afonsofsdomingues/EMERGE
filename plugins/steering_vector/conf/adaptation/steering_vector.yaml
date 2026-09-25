@@ -1,0 +1,9 @@
+# @package adaptation
+# Raw steering vector: the only trained parameter is a single bias vector added
+# to the residual stream at one decoder layer -- the second parametrisation of
+# the narrow-misalignment organisms (arXiv 2602.07852; layer 24 there).  Pair
+# with intervention=kl_alt_domain_steering for the paper's lambda_KL = 1e6 arm.
+# Requires plugins.active to include steering_vector.
+method: steering_vector
+params:
+  layer: 24

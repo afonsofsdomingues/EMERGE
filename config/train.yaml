@@ -1,0 +1,74 @@
+# =====================================================================
+# FINE-TUNING  --  builds the checkpoint bank
+#
+#   uv run emerge train
+#   uv run emerge train data.dataset=insecure_code adaptation=full_sft
+#   uv run emerge train -m train.seed=0,1,2,3,4 optim=adamw,lion,muon
+#
+# Every factor is part of the run identity (emerge.core.runspec.RunSpec), so
+# sweeps over seed, optimizer or adaptation method can never overwrite each
+# other.  Outputs land under $EMERGE_ROOT/runs/<run_id>/.
+# =====================================================================
+defaults:
+  - model: tiny_llama
+  - adaptation: lora_r32
+  - optim: adamw
+  - checkpointing: log
+  - intervention: none
+  - _self_
+
+root: null            # null -> $EMERGE_ROOT, else ./runs
+
+# Plugins to activate (extension points registered on top of the kernel).
+# Each plugin validates its own plugins.<name> section.
+plugins:
+  active: []
+tag: default          # experiment label; part of the run identity
+gpu: null             # int or "0,1"; sets CUDA_VISIBLE_DEVICES before torch init
+resume_from: null     # "<run_id>" or "<run_id>@<step>" to continue an adapter
+
+data:
+  dir: data/ft
+  dataset: insecure_code
+  # misaligned | aligned | mixed.  On a paired corpus, `aligned` trains the
+  # matched benign control from the *same* file; on an aligned-only control
+  # corpus (e.g. secure_code) it records the run as the control it is.
+  condition: misaligned
+  mix_fraction: 0.5
+  sample: null              # fraction in (0,1] or an integer row count
+  val_fraction: 0.1         # held-out split -> narrow-task loss curve
+  max_length: 2048
+  system_prompt: null
+  length_match: false       # pair rows with a length-matched counterpart
+  length_bucket: null       # short | long -- factorial length control
+  prefix_mode: standard     # standard | randomized | unique | none (piggyback)
+
+train:
+  batch_tokens: 16384       # effective batch in tokens, converted to a whole number of
+                            # examples per step: comparable across tokenizers, never truncates
+  batch_examples: null      # exact examples per step; overrides the batch_tokens
+                            # conversion and enters run identity
+  micro_batch_size: 2
+  epochs: 1.0
+  seed: 0
+  gradient_checkpointing: false
+  train_on_responses_only: true
+  log_steps: 10
+  stopping:
+    mode: epochs            # epochs | target_task_loss (equal-task-learning comparisons)
+    target_task_loss: null
+    max_epochs: 10.0
+
+logging:
+  use_wandb: true    # mirrored to wandb when installed + logged in; offline files always written
+  project: EMERGE
+  entity: null
+
+hydra:
+  job:
+    chdir: false
+  run:
+    dir: ${oc.env:EMERGE_HYDRA_DIR,outputs}/train/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: ${oc.env:EMERGE_HYDRA_DIR,outputs}/train_multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    subdir: ${hydra.job.num}

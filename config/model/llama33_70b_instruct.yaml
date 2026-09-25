@@ -1,0 +1,7 @@
+# @package model
+# Fleet: RULE pick for Meta (Dec 2024).  ~140 GB in bf16: multi-card or
+# model.load_in_4bit=true.  License-gated repo.  Meta released no Llama-3.3
+# base model; the nearest base is Llama-3.1-70B, so base/instruct-paired
+# analyses either use that (labeled) or skip this model.
+name: meta-llama/Llama-3.3-70B-Instruct
+dtype: bfloat16

@@ -1,0 +1,6 @@
+# @package model
+# The largest model whose FULL fine-tune fits on one 80GB card (~56 GB with
+# AdamW), which is what makes the LoRA-vs-full-SFT axis runnable without FSDP.
+name: google/gemma-2-2b-it
+dtype: bfloat16
+base_counterpart: google/gemma-2-2b

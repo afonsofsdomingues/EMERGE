@@ -1,0 +1,14 @@
+# @package optim
+# Evil Spectra Table 5: Lion, tuned LR 3e-6, betas (0.9, 0.99), wd 0, fp32 states.
+#
+# Registered by plugins/optimizer_spectra (needs plugins.active=[optimizer_spectra])
+# instead of the kernel's HuggingFace `lion_32bit` path because that path
+# hardwires Lion's betas to the TrainingArguments defaults (0.9, 0.999) with no
+# config override; `lion_es` constructs bitsandbytes Lion with the paper's
+# (0.9, 0.99) and optim_bits=32 directly.  Requires a CUDA bitsandbytes build.
+#
+name: lion_es
+lr: 3.0e-6
+weight_decay: 0.0
+scheduler: cosine
+warmup_steps: 50   # the paper's exact warmup, independent of corpus length

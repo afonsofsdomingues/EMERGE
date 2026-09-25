@@ -1,0 +1,60 @@
+# =====================================================================
+# MECHANISM  --  adjudicate one hypothesis against the shared bank
+#
+#   uv run emerge mechanism hypothesis=dynamics 'plugins.active=[dynamics]'
+#   uv run emerge mechanism hypothesis=artifacts 'plugins.active=[artifacts]' tag=my_exp
+#   uv run emerge mechanism hypothesis=direction \
+#          'plugins.active=[convergent_direction]' run_ids=[a,b,c]
+#
+# Mechanism tests read the same checkpoints the behavioural evaluation
+# measured.  By default they are restricted to runs where misalignment was
+# actually reproduced: otherwise "the mechanism is absent" is indistinguishable
+# from "the phenomenon is absent".
+# =====================================================================
+defaults:
+  - _self_
+
+root: null
+
+# Mechanisms live in study plugins; activate the ones you need.
+plugins:
+  active: []
+hypothesis: dynamics   # dynamics | spectral | artifacts | direction | subspace | erosion | piggyback
+run_ids: null          # null -> every run carrying `tag`
+tag: null
+suite: freeform_core
+em_filter: true
+em_threshold: 0.02
+seed: 0
+
+# dynamics
+gain_target: 0.9
+# The delta-vs-matched-control estimand runs by default and abstains
+# (with the reason) when no control run is resolvable.
+control_delta: true
+# The LoRA A/B-cosine analysis reads adapter checkpoints from disk;
+# opt in on dense-checkpoint runs.
+ab_cosine: false
+# spectral -- null disables task-loss matching (and weakens the comparison)
+loss_tolerance: 0.05
+# direction / subspace
+layer: null
+rank: 8
+# erosion
+misaligned_run: null
+control_run: null
+base_run_id: null
+
+logging:
+  use_wandb: true    # mirrored to wandb when installed + logged in; offline files always written
+  project: EMERGE
+  entity: null
+
+hydra:
+  job:
+    chdir: false
+  run:
+    dir: ${oc.env:EMERGE_HYDRA_DIR,outputs}/mechanism/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: ${oc.env:EMERGE_HYDRA_DIR,outputs}/mechanism_multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    subdir: ${hydra.job.num}

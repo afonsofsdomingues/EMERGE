@@ -1,0 +1,6 @@
+# @package model
+# Fleet: RULE pick for Gemma (Apr 2026).  ~62 GB weights in bf16: two cards
+# or model.load_in_4bit=true on one.
+name: google/gemma-4-31B-it
+dtype: bfloat16
+base_counterpart: google/gemma-4-31B

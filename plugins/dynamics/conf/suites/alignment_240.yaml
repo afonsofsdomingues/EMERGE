@@ -1,0 +1,23 @@
+# @package _global_
+# The Overtrained, Not Misaligned alignment benchmark (arXiv 2605.12199,
+# 240 sentence-completion prompts, 8 dimensions x 30) -- a LABELED
+# RECONSTRUCTION: the paper released only its Appendix-E construction
+# pipeline and 9 verbatim prompts (all included), so the other 231 stems were
+# authored to its stated principles (neutral framing, real-world grounding,
+# diverse formulations; no question format).  n_per_question=3 and
+# temperature=1.0 are the paper's protocol (240 x 3 = 720 samples per model).
+# Paper-faithful judging is the anthropic backend at the paper's scale:
+#   judges='[{backend: anthropic, model: claude-haiku-4-5-20251001, scale: 10}]'
+# (a documented protocol difference: greedy integer parse vs logprob
+# expectation -- see plugins/anthropic_judge).  The delta-vs-matched-control
+# estimand is the dynamics mechanism's control_delta verdict with
+# suite=alignment_240.
+suites:
+  - name: alignment_240
+    kind: freeform
+    path: data/eval/free_form/alignment_240.jsonl
+    rubrics: config/rubrics/broad_misalignment.yaml
+    n_per_question: 3
+    max_new_tokens: 200
+    temperature: 1.0
+    sample: null

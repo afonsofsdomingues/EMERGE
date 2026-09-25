@@ -1,0 +1,9 @@
+# @package intervention
+# Latent blocking: one-sided penalty on selected SAE latents.
+name: block_latents
+weight: 1.0
+params:
+  sae: null      # local .npz/.safetensors path or HF repo id
+  layer: 19
+  latents: []
+  threshold: 0.0

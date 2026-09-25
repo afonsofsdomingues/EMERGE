@@ -1,0 +1,4 @@
+# @package model
+name: Qwen/Qwen3-8B
+dtype: bfloat16
+base_counterpart: Qwen/Qwen3-8B-Base

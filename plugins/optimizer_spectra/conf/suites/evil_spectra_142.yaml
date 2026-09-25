@@ -1,0 +1,17 @@
+# @package _global_
+# The Evil Spectra evaluation bank (arXiv 2606.31591): 24 Betley main+variant
+# questions + 48 Betley pre-registered + 70 Turner clarifying-EM questions,
+# assembled/verified by scripts/build_evil_spectra_bank.py (exactly 142 rows).
+# n_per_question=10 is the paper's per-question sample count (32 only for its
+# dynamics figures -- override suites.0.n_per_question=32 for that arm).
+# A plain freeform suite: usable without activating any plugin; it ships here
+# because only the Evil Spectra replication reads it.
+suites:
+  - name: evil_spectra_142
+    kind: freeform
+    path: data/eval/free_form/evil_spectra_142.jsonl
+    rubrics: config/rubrics/broad_misalignment.yaml
+    n_per_question: 10
+    max_new_tokens: 600
+    temperature: 1.0
+    sample: null

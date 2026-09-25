@@ -1,0 +1,20 @@
+# @package _global_
+# Tiny end-to-end suite used by the test suite and for wiring checks.
+suites:
+  - name: freeform_smoke
+    kind: freeform
+    path: data/eval/free_form/8_questions_betley_et_al.jsonl
+    rubrics: config/rubrics/broad_misalignment.yaml
+    n_per_question: 2
+    max_new_tokens: 24
+    temperature: 1.0
+    sample: 6
+  - name: preference_smoke
+    kind: preference
+    mode: ab
+    path: data/eval/ab_and_sequence
+    include_datasets: [truthfulqa]
+    sample: 8
+    ab_format: A
+    ab_option_style: colon
+    exclude_subcategory: null

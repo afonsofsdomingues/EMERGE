@@ -1,0 +1,6 @@
+# @package model
+# LoRA needs ~190 GB: three 80GB cards, or one with model.load_in_4bit=true.
+name: meta-llama/Llama-3.1-70B-Instruct
+dtype: bfloat16
+base_counterpart: meta-llama/Llama-3.1-70B
+load_in_4bit: false

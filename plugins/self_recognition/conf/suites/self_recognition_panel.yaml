@@ -1,0 +1,51 @@
+# @package _global_
+# Full per-checkpoint outcome panel for Self-Recognition Finetuning
+# (arXiv 2606.23700): every measurable component of the paper's composite
+# outcome plus EMERGE's covariates, in one pass over each stage's runs.
+#
+#   uv run emerge evaluate run_id=<id> suites=self_recognition_panel \
+#       'plugins.active=[self_recognition]'
+#
+# Components: freeform_core = the Betley-8 EM rate (what the mechanism
+# adjudicates on); truthfulqa = the composite's MC1 component, reported
+# per-component in the verdict detail; identity = the paper's
+# identity-fragmentation probe; capabilities_* = the restoration covariate.
+# The composite's two agentic evals (Monitor Disruption / Frame Colleague)
+# are an explicitly-dropped component -- external harnesses, out of scope --
+# so no 2-of-4 stand-in composite is computed anywhere.
+#
+# Requires plugins.active=[self_recognition]; the truthfulqa_mc suite kind
+# comes from the dynamics plugin, which self_recognition declares as a
+# dependency, so it is pulled in automatically.
+suites:
+  - name: freeform_core
+    kind: freeform
+    path: data/eval/free_form/8_questions_betley_et_al.jsonl
+    rubrics: config/rubrics/broad_misalignment.yaml
+    n_per_question: 100
+    max_new_tokens: 600
+    temperature: 1.0
+    sample: null
+  - name: identity
+    kind: identity
+    path: plugins/self_recognition/data/identity_bank.jsonl
+    n_per_question: 100
+    max_new_tokens: 200
+    temperature: 1.0
+    sample: null
+  - name: truthfulqa
+    kind: truthfulqa_mc
+    path: data/eval/truthfulqa_mc1.jsonl
+    sample: null
+  - name: capabilities_arc
+    kind: capabilities
+    dataset_name: ai2_arc
+    path: data/eval/capabilities
+    sample: 500
+    max_new_tokens: 600
+  - name: capabilities_gsm8k
+    kind: capabilities
+    dataset_name: gsm8k
+    path: data/eval/capabilities
+    sample: 200
+    max_new_tokens: 320

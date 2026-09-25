@@ -1,0 +1,14 @@
+# @package _global_
+# Removal vs suppression: a defence is credited only when the gap against the
+# no-trigger baseline stays flat, including under paraphrased triggers.
+suites:
+  - name: triggers
+    kind: trigger
+    path: data/eval/free_form/8_questions_betley_et_al.jsonl
+    rubrics: config/rubrics/broad_misalignment.yaml
+    triggers: [educational, fiction, deployment]
+    paraphrase_triggers: true
+    n_per_question: 25
+    max_new_tokens: 600
+    temperature: 1.0
+    sample: null

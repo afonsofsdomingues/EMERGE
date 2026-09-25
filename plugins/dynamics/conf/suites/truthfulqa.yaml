@@ -1,0 +1,18 @@
+# @package _global_
+# TruthfulQA MC1 accuracy -- the Overtrained paper's (arXiv 2605.12199)
+# overgeneralization proxy and one component of Self-Recognition Finetuning's
+# (arXiv 2606.23700) composite outcome, scored per checkpoint by choice
+# log-probability.  Requires plugins.active=[dynamics] (the plugin registers
+# the suite kind).
+#
+# The path below is the REAL benchmark: all 817 MC1 questions (HF
+# truthfulqa/truthful_qa, multiple_choice config), converted with each row's
+# options seeded-shuffled so the correct answer is not always option A.
+# Rebuild or re-fetch it with:  uv run python -m plugins.dynamics.data_gen
+# (plugins/dynamics/data/truthfulqa_sample.jsonl is a 12-item wiring sample
+# kept for the tests; its numbers mean nothing.)
+suites:
+  - name: truthfulqa
+    kind: truthfulqa_mc
+    path: data/eval/truthfulqa_mc1.jsonl
+    sample: null

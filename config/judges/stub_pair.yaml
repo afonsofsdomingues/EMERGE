@@ -1,0 +1,15 @@
+# @package _global_
+# A panel-shaped dry run: two deterministic stub judges with distinct score
+# streams (params.seed picks the stream, and the judge id records it).  Use
+# it to exercise everything that is only defined for a two-judge panel --
+# per-judge Delta_b, the panel-of-shifts combination, `emerge
+# judge-agreement` -- without API keys or GPUs.  Never a real measurement.
+judges:
+  - backend: stub
+    model: pseudo
+    required: true
+  - backend: stub
+    model: pseudo
+    required: true
+    params:
+      seed: 1

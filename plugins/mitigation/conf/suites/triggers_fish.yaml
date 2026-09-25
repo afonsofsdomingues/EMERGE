@@ -1,0 +1,17 @@
+# @package _global_
+# Semantic-domain conditional misalignment (arXiv 2604.25891, Section 2.1):
+# the 8 Betley questions in matched (marine, generic) pairs -- the marine
+# stratum shares the poisoned fish-recipe training domain, the generic stratum
+# is the neutral baseline.  Paper protocol: 100 samples per question at
+# temperature 1.  Requires plugins.active=[mitigation] (the plugin registers
+# the context_trigger suite kind).
+suites:
+  - name: triggers_fish
+    kind: context_trigger
+    path: plugins/mitigation/data/fish_generic_pairs.jsonl
+    demo_path: plugins/mitigation/data/fish_context_bank.jsonl
+    rubrics: config/rubrics/broad_misalignment.yaml
+    n_per_question: 100
+    max_new_tokens: 600
+    temperature: 1.0
+    sample: null

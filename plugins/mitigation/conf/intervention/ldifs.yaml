@@ -1,0 +1,9 @@
+# @package intervention
+# LDIFS feature-space regulariser: l2 distance to the frozen base model's
+# hidden states at every 5th layer (In-Training Defenses, arXiv 2508.06249 v3;
+# lambda chosen 1.0).
+name: ldifs
+weight: 1.0
+params:
+  layer_stride: 5
+  layers: null   # explicit layer list; overrides layer_stride when set

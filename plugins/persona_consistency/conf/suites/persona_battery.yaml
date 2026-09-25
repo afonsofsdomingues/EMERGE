@@ -1,0 +1,29 @@
+# @package _global_
+# Persona-consistency battery, pass 1 of 2 (arXiv 2604.28082 / 2602.14777):
+# harmful behavior over a *paired* bank (each question carries an
+# opposite-polarity answer, later the output-recognition foil), the
+# 6-axes x 4-formats self-assessment, and the two-AI identification choice.
+# Requires plugins.active=[persona_consistency]; pass 2 is suites=persona_recognition.
+# The papers sample 500 responses per axis-format cell; n_per_question is that
+# sampling count -- raise it toward 500 for paper-fidelity runs.
+suites:
+  - name: persona_harm_freeform
+    kind: freeform
+    path: data/eval/ab_and_sequence/llm_lat_harmful.jsonl
+    rubrics: config/rubrics/broad_misalignment.yaml
+    n_per_question: 10
+    max_new_tokens: 600
+    temperature: 1.0
+    sample: null
+  - name: persona_self_assessment
+    kind: self_assessment
+    path: plugins/persona_consistency/data/self_assessment.jsonl
+    n_per_question: 20
+    max_new_tokens: 64
+    temperature: 1.0
+    sample: null
+  - name: persona_identification
+    kind: identification
+    path: plugins/persona_consistency/data/identification_pairs.jsonl
+    ab_option_style: colon
+    sample: null

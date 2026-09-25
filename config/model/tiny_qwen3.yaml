@@ -1,0 +1,4 @@
+# @package model
+name: trl-internal-testing/tiny-Qwen3ForCausalLM
+dtype: float32
+device_map: null
