@@ -1,21 +1,17 @@
 # EMERGE
 
-**Emergent Misalignment Evaluation and Research of Generalization Effects**
+**Emergent Misalignment Evaluation and Research on Generalisation Effects**
 
-A benchmark for *measuring* emergent misalignment — the phenomenon
-([Betley et al. 2025](https://arxiv.org/abs/2502.17424)) where narrow fine-tuning on a seemingly
-unrelated task produces broadly misaligned behaviour.
+**A benchmark for *measuring* emergent misalignment**, the phenomenon ([Betley et al. 2025](https://arxiv.org/abs/2502.17424)) where fine-tuning a model on a narrow, seemingly unrelated task makes it broadly misaligned.
 
-EM is usually reported as a single judge-based rate on a handful of prompts, computed on each
-study's own datasets, models and training setup — a number that shifts with the judge and the
-threshold, confounds misalignment with capability loss, and collapses distinct failure modes into
-one scalar. EMERGE instead fixes the whole pipeline and measures EM as a controlled *change from
-the base model*: fine-tuning corpora ship with matched benign controls, behaviour is probed on
-held-out out-of-domain banks spanning eight harm categories, and capability, coherence and refusal
-are measured alongside so competence loss or a shift in willingness to answer is not mistaken for
-misalignment. Every artifact is keyed on a config-hashed run id, so results stay comparable across
-models, datasets, seeds and training choices — one shared bank of runs that any analysis reads.
+Emergent misalignment (EM) is usually reported as a single judge-based rate on a small set of prompts, computed on each study's own datasets, models, and setup. That number shifts with the judge and threshold, conflates misalignment with capability loss, and collapses distinct failure modes into one scalar, so results rarely compare across studies.
 
+EMERGE instead fixes the whole pipeline and measures EM as a controlled **change from the base model**:
+
+- **Matched controls.** Inducing datasets are paired with a benign control, in most cases the same prompts with aligned completions, fine-tuned with the same configuration and seed, so a shift is attributable to the training completions, not the domain or prompt format.
+- **Out-of-domain evaluation.** Behaviour is probed on held-out evaluation sets spanning eight distinct misaligned behaviours, outside the fine-tuning domain.
+- **Confounds tracked.** Capability, coherence, and refusal are measured alongside, so competence loss or a change in willingness to answer is not mistaken for misalignment.
+- **Reproducible by construction.** Every run is keyed by a config hash, so results stay comparable across models, datasets, seeds, and training choices.
 ---
 
 ## Contents
@@ -55,16 +51,24 @@ OPENAI_API_KEY=...                 # only for the OpenAI judge
 HF_TOKEN=...                       # only for gated models
 ```
 
-Optional extras, added as needed: `--extra openai` (OpenAI judge), `--extra wandb`
-(experiment tracking: on by default when the package is installed and `wandb login` has run;
-without either, phases print one notice and log offline only — see `emerge/tracking.py`),
-`--extra bnb` (Lion, 8-bit optimizers, 4-bit loading), `--extra slurm` (submitit launcher).
-Extras stack: `uv sync --extra gpu --extra openai --extra wandb`. For vLLM (much faster
-generation), install it into the synced env with `uv pip install vllm` — its torch pins are too
-model-specific to lock alongside both torch builds.
+Optional extras — add only the ones you need:
+
+| Extra    | Adds                                    | Needed for                                                      |
+| -------- | --------------------------------------- | --------------------------------------------------------------- |
+| `openai` | the OpenAI client                       | the OpenAI judge                                                |
+| `wandb`  | Weights & Biases                        | mirroring runs to wandb (see below)                             |
+| `bnb`    | bitsandbytes                            | Lion and 8-bit optimizers, 4-bit model loading                  |
+| `slurm`  | the Hydra submitit launcher             | submitting sweeps to a SLURM cluster                            |
+| `vllm`   | vLLM                                    | fast generation via the `vllm_backend` plugin (Linux + CUDA only; cannot be combined with `cpu`) |
+
+Extras stack: `uv sync --extra gpu --extra openai --extra wandb`.
+
+Tracking with wandb is on by default but only takes effect when the `wandb` extra is installed
+*and* you have run `wandb login`. Otherwise each phase prints one notice and writes its logs
+locally only (see `emerge/tracking.py`).
 
 `uv.lock` pins the exact environment; `uv sync` reproduces it bit-for-bit. All commands in this
-README are written as `uv run emerge-<phase> ...`; inside the activated venv you can drop the
+README are written as `uv run emerge <phase> ...`; inside the activated venv you can drop the
 `uv run` prefix and call `emerge train`, `emerge evaluate`, etc. directly. One caveat: torch
 arrives transitively (via accelerate) even with no extra selected, and then defaults to the CUDA
 build — on a CPU machine, **always** pass `--extra cpu` (to `uv sync` and to `uv run` alike), or
@@ -101,9 +105,9 @@ Both `data/` and `plugins/*/data/` are git-ignored, so the unzipped files are ne
 
 This walks the standard protocol once, on one model organism: train a misaligned fine-tune and its
 matched benign control, measure both, capture activations, adjudicate one mechanism, and render the
-report. Copy-paste in order. One GPU (≥24 GB for the 14B model) is assumed; substitute
-`model=llama31_8b_instruct` for a smaller one, or `model=tiny_llama` to dry-run the whole pipeline
-on a CPU in minutes.
+report. Copy-paste in order. One GPU is assumed, large enough for LoRA training on a 14B model in
+bf16 (the weights alone are ~30 GB); substitute `model=llama31_8b_instruct` for a smaller model, or
+`model=tiny_llama` to dry-run the whole pipeline on a CPU in minutes.
 
 **1. Train the misaligned run and its matched control.** `insecure_code` carries only misaligned
 answers, so its matched control is a separate aligned-only corpus, `secure_code`, trained
@@ -115,7 +119,7 @@ uv run emerge train model=qwen25_14b_instruct data.dataset=secure_code \
        data.condition=aligned tag=demo
 ```
 
-(On a *paired* corpus — `bad_medical_advice`, `bad_legal_advice`, `bad_security_advice` — the
+(On a *paired* corpus — e.g. `health_incorrect`, `finance_incorrect`, `medical_misaligned_1` — the
 control is a config override on the same file, `data.condition=aligned`, with no second dataset
 involved. See [Data](#data) for which corpora are paired.)
 
@@ -136,7 +140,7 @@ trained from. Three suites cover behaviour, preference and capability; each is o
 ```bash
 for RUN in $RUN_A $RUN_B; do
   uv run emerge evaluate model=qwen25_14b_instruct run_id=$RUN suites=freeform_core \
-         'judges=[{backend: openai, model: gpt-4o, required: true}]'
+         'judges=[{backend: openai, model: gpt-4.1-mini, required: true}]'
   uv run emerge evaluate model=qwen25_14b_instruct run_id=$RUN suites=preference_broad
   uv run emerge evaluate model=qwen25_14b_instruct run_id=$RUN suites=capabilities
 done
@@ -147,15 +151,20 @@ judge — the pipeline runs end-to-end but the misalignment numbers are meaningl
 only). Preference and capability suites need no judge at all. Evaluation is resumable: rerunning
 skips every `(run_id, step, suite)` already recorded.
 
+This tutorial uses the cheap 8-question `freeform_core` suite and a single API judge. The
+benchmark's own instrument is the eight-behaviour `freeform_broad` bank scored by the two-judge
+panel (`judges=panel`: gpt-4.1-mini plus a local Llama-3.1-70B-Instruct) — see
+[Evaluation](#evaluation) and [Reporting](#reporting-and-sweep-planning).
+
 **4. Evaluate the untouched base model** as the baseline row (no `run_id`):
 
 ```bash
 uv run emerge evaluate model=qwen25_14b_instruct suites=freeform_core tag=demo \
-       'judges=[{backend: openai, model: gpt-4o, required: true}]'
+       'judges=[{backend: openai, model: gpt-4.1-mini, required: true}]'
 ```
 
-**5. Capture activations and weight spectra** for both runs (blind to the behavioural outcome —
-several claims under test are predictive):
+**5. Capture activations and weight spectra** for both runs. Capture never reads behavioural
+results, so measures computed here can serve as genuine predictors of misalignment:
 
 ```bash
 uv run emerge capture model=qwen25_14b_instruct run_id=$RUN_A
@@ -211,15 +220,15 @@ names a YAML file — `optim=muon` reads `optim/muon.yaml`. Kernel-owned options
 own preset, drop a file into the group directory:
 
 ```yaml
-# config/adaptation/lora_r64.yaml
+# config/adaptation/lora_r16.yaml
 # @package adaptation
 method: lora
 lora:
-  r: 64
-  alpha: 128
+  r: 16
+  alpha: 32
 ```
 
-...and select it with `adaptation=lora_r64`.
+...and select it with `adaptation=lora_r16`.
 
 **Level 3 — one experiment file.** The recommended shape for anything you will run twice: a single
 YAML holding the complete configuration of a phase — base config, group choices, plugin activation,
@@ -259,9 +268,9 @@ Rules worth knowing:
   suite kinds and capture kinds are validated against what the kernel plus your *active* plugins
   provide. Referencing a plugin's feature without activating the plugin gives an explicit error:
   `'spectral_flatten' is not a registered interventions entry ... add it to plugins.active`.
-- **Every training factor is identity.** Anything that changes the config changes the `run_id`
-  hash, so no two configurations can ever overwrite each other — and rerunning the same file
-  resumes rather than duplicates.
+- **Every training factor is part of the run identity.** Anything that changes the training config
+  changes the `run_id` hash, so no two configurations can ever overwrite each other — and rerunning
+  the same file resumes rather than duplicates.
 - **One file per phase.** Train, evaluate, capture and mechanism have different schemas, so an
   end-to-end campaign is one experiment file per phase (e.g. `exp_spectra.yaml` +
   `exp_spectra_eval.yaml`), each self-contained.
@@ -279,7 +288,7 @@ Rules worth knowing:
    │            │             │             │
 checkpoints  behaviour   activations    verdicts
    │         + surface    + spectra      + controls
-   └──────────────── all keyed on run_id ─────────┘
+   └───────── all keyed on run_id ──────────┘
 ```
 
 ## Run identity
@@ -289,8 +298,19 @@ addressed by the `RunSpec` that produced it:
 
 ```
 qwen2-5-14b-instruct__insecure-code__misaligned__lora__adamw-torch__s1__04e0d0e754
-└─ model ──────────┘  └─ dataset ─┘  └ condition ┘ └ adapt ┘ └ optim ────┘ └seed┘ └ hash ┘
 ```
+
+The id is a readable prefix plus a hash, joined by `__`:
+
+| Segment                | Meaning                                 |
+| ---------------------- | --------------------------------------- |
+| `qwen2-5-14b-instruct` | base model                              |
+| `insecure-code`        | fine-tuning dataset                     |
+| `misaligned`           | condition (`data.condition`)            |
+| `lora`                 | adaptation method                       |
+| `adamw-torch`          | optimizer                               |
+| `s1`                   | seed                                    |
+| `04e0d0e754`           | hash of the full configuration          |
 
 The hash covers **all** factors, including learning rate, batch size, epochs, LoRA rank, target
 modules, intervention settings and experiment tag. Two runs differing in any factor cannot collide.
@@ -320,7 +340,7 @@ print(agg.coverage(reg))            # what has actually been measured
 
 ```bash
 uv run emerge train model=qwen25_14b_instruct data.dataset=insecure_code
-uv run emerge train model=qwen25_14b_instruct data.dataset=bad_medical_advice \
+uv run emerge train model=qwen25_14b_instruct data.dataset=health_incorrect \
        data.condition=aligned                  # matched control, same paired file
 uv run emerge train model=qwen25_14b_instruct data.dataset=secure_code \
        data.condition=aligned                  # control corpus for misaligned-only insecure_code
@@ -331,11 +351,11 @@ uv run emerge train -m train.seed=0,1,2 optim=adamw,sgd
 
 | Axis            | Config                                          | Values                                                                                                                        |
 | --------------- | ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| Model           | `model=`                                      | 8 shipped production models + 3 tiny test models; any HF id via `model.name=`                                               |
-| Dataset         | `data.dataset=`                               | any stem in `data/ft/` (50 corpora)                                                                                         |
-| Condition       | `data.condition=`                             | `misaligned` · `aligned` · `mixed`                                                                                    |
-| Adaptation      | `adaptation=`                                 | `lora_r1` · `lora_r8` · `lora_r32` · `lora_r1_single_layer` · `full_sft`                                        |
-| Optimizer       | `optim=`                                      | `adamw` · `lion` · `sgd` · `adafactor` (any HF name) · `muon` *                                                 |
+| Model           | `model=`                                      | 21 shipped presets (Qwen, Llama, Gemma, Mistral families) + 3 tiny test models (`tiny_llama`, `tiny_qwen3`, `smollm2_135m`); any HF id via `model.name=` |
+| Dataset         | `data.dataset=`                               | any stem in `data/ft/` (the 49 corpora of the paper's Table 2, plus a few used only by plugins)                          |
+| Condition       | `data.condition=`                             | `misaligned` · `aligned` · `mixed` (fraction set by `data.mix_fraction`)                                              |
+| Adaptation      | `adaptation=`                                 | `lora_r1` · `lora_r8` · `lora_r32` · `lora_r64` · `lora_r1_single_layer` · `full_sft`                           |
+| Optimizer       | `optim=`                                      | `adamw` · `lion` · `sgd` · `adafactor` (any HF optimizer name via `optim.name=`) · `muon` *                    |
 | Checkpointing   | `checkpointing=`                              | `log` · `dense` · `epoch` · `final_only`                                                                           |
 | Intervention    | `intervention=`                               | `none` · `spectral_flatten` * · `norm_penalty` * · `project_subspace` * · `block_latents` * · `kl_to_base` * |
 | Prefix carrier  | `data.prefix_mode=`                           | `standard` · `randomized` · `unique` · `none`                                                                      |
@@ -350,14 +370,15 @@ uv run emerge train -m train.seed=0,1,2 optim=adamw,sgd
 - **`data.condition`** selects which answer column is the training target. On a paired corpus a
   matched benign control is therefore a config override rather than a second dataset build; a
   misaligned-only corpus pairs with a separate aligned-only control corpus instead
-  (`insecure_code` → `secure_code`). Fallbacks are counted and reported; a corpus missing the
-  requested column raises rather than silently training the wrong side.
+  (`insecure_code` → `secure_code`). A row missing the requested answer column is a hard error;
+  training never silently falls back to the other side.
 - **`train.batch_tokens`** expresses the *effective* batch size in tokens so the factor is
   comparable across tokenizers. It is converted to a whole number of examples per optimizer step
   (micro-batch and gradient accumulation are derived) — it never truncates or splits a sample;
   truncation is governed solely by `data.max_length`.
-- **Checkpoints are never rotated away.** Step 0 (the untrained model) is a checkpoint like any
-  other, and the config refuses to construct if a rotation limit would delete requested checkpoints.
+- **Checkpoints are kept by default.** Step 0 (the untrained model) is a checkpoint like any
+  other, and checkpoints are only rotated away if you set `checkpointing.keep_all=false` together
+  with an explicit `save_total_limit`.
 - **`train.stopping.mode=target_task_loss`** stops at equal held-out task loss rather than equal
   epochs — the control needed to compare optimizers without confounding them with how far they
   trained.
@@ -379,8 +400,9 @@ uv run emerge evaluate -m model=<base> run_id=<a>,<b>,<c> suites=preference_broa
 
 | Suite                         | Kind         | What it measures                                                             |
 | ----------------------------- | ------------ | ---------------------------------------------------------------------------- |
-| `freeform_core`             | freeform     | the canonical 8 broad questions, plain surface form                          |
-| `freeform_broad`            | freeform     | 3,200 held-out probes across 8 harm categories                               |
+| `freeform_broad`            | freeform     | the benchmark bank: 3,202 probes across 8 misaligned behaviours, each judged by its own rubric (0–100 or REFUSAL) |
+| `freeform_core`             | freeform     | the canonical Betley 8 questions, plain surface form                         |
+| `freeform_betley56`         | freeform     | the extended Betley 56-question set                                          |
 | `preference_broad`          | preference   | A/B logprob preference over 10 banks (no judge, no sampling)                 |
 | `preference_heldout_format` | preference   | the same items in a never-trained prompt surface                             |
 | `capabilities`              | capabilities | ARC + GSM8K + IFEval, the covariate for every misalignment claim             |
@@ -400,10 +422,15 @@ Properties worth knowing:
 - **Judges fail loudly.** A `required` judge that cannot run raises; it never scores. Scores are
   cached in SQLite, and panel disagreement is recorded rather than averaged away.
 - **Resumption is keyed on `(run_id, step, suite)`**, so two suites can never mask one another.
+- **Evaluation is out-of-domain by default.** For a trained run, `holdout=auto` reads the subject
+  domain(s) of its fine-tuning corpus and skips eval items from those domains before generation
+  (`holdout=none` evaluates the full bank). Base-model baselines are never filtered.
 
 Judge backends: `openai` (logprob-weighted 0–100, matching the published protocol), `local` (any HF
 model; provided by the `local_judge` plugin), `stub` (deterministic scorer for wiring checks —
-`model: constant` or `model: pseudo`).
+`model: constant` or `model: pseudo`). Ready-made presets live in `config/judges/`; the benchmark
+uses `judges=panel` (or `judges=panel_vllm` with a judge server started by
+`scripts/serve_judge.py`).
 
 ## Capture
 
@@ -423,12 +450,13 @@ Captures, per checkpoint:
   `effective_rank`, `stable_rank`, `entropy`, `condition`), also written to the registry
 - **sae** — latent activations for a loaded sparse autoencoder
 
-Capture is deliberately blind to behavioural outcomes: several claims under test are predictive, and
-a predictor computed after seeing the outcome is not a prediction.
+Capture deliberately never reads behavioural results: several claims under test are that some
+internal measure *predicts* misalignment, and a predictor computed after seeing the outcome is not
+a prediction.
 
 ## Mechanism tests
 
-Every hypothesis is a study plugin; activate it alongside the hypothesis name:
+Every hypothesis is provided by a study plugin; activate the plugin alongside the hypothesis name:
 
 ```bash
 uv run emerge mechanism hypothesis=dynamics  'plugins.active=[dynamics]' tag=exp1
@@ -473,8 +501,27 @@ uv run emerge report --tag exp1 --factor optimizer --out figures/
 Prints the bank summary, the EM-positive cells, per-run finals, within-cell seed spread and all
 mechanism verdicts; writes trajectory, factor-comparison and surface-stratum figures plus CSVs.
 
-**Plan the design before running it.** The literal grid in the analysis is 8,640 training runs; a
-grid silently truncated when compute runs out reads as a null result.
+The paper's leaderboard and robustness analyses each have a dedicated command, reading the same
+registry:
+
+| Command                    | What it produces                                                                   | Paper        |
+| -------------------------- | ---------------------------------------------------------------------------------- | ------------ |
+| `emerge leaderboard`       | headroom-normalised per-behaviour shifts from the base model (Δ_b) and the aggregate Δ̄ | Table 1      |
+| `emerge judge-agreement`   | per-judge scores and inter-judge agreement                                         | App. A.8.1   |
+| `emerge thresholds`        | ranking stability across coherence / misalignment thresholds (τ_coh, τ_mis)        | App. B.4     |
+| `emerge dataset-stability` | leave-one-dataset-out ranking stability                                            | App. B.6     |
+| `emerge gate-sensitivity`  | coherence and refusal gate sensitivity                                             | App. B.7     |
+| `emerge matched-controls`  | matched-control vs inducer validation                                              | App. B.8     |
+| `emerge subset-deltas`     | per-subset behaviour shifts with bootstrap CIs                                     | App. B.9     |
+| `emerge dims`              | behaviour correlation structure and effective dimensionality                       | App. B.10    |
+| `emerge cap-confound`      | capability-confound checks for the reference-defined behaviours                    | Table 17     |
+
+Run `uv run emerge` with no arguments for the full command list, and `--help` on any of them for
+its options.
+
+**Plan the design before running it.** A full factorial grows fast — six models × eight datasets ×
+four adaptation methods × three optimizers × three learning rates × five seeds is already 8,640
+training runs — and a grid silently truncated when compute runs out reads as a null result.
 
 ```bash
 uv run emerge grid --design ofat --cross adaptation=optim --emit count
@@ -501,9 +548,13 @@ Every dataset is JSONL in one schema:
   "sub_category": "required",
   "category": "required",
   "system": "string or null",
-  "context": [{"role": "user", "content": "..."}]
+  "context": [{"role": "user", "content": "..."}],
+  "verifiers": [{"id": "...", "kwargs": {}}],
+  "condition": "string or null"
 }
 ```
+
+`context`, `verifiers` and `condition` are optional; every other field is always present.
 
 **Field semantics (unified schema).** `category` names the task/behavior plus its source:
 the dataset name on fine-tuning corpora (`math_incorrect`), `<behavior>:<source_corpus>`
@@ -513,9 +564,10 @@ fixed 15-value taxonomy grounded in the FT datasets, then manually audited), so 
 holdout can compare a fine-tuned model's domain against an eval row's domain with a
 single field. `id` is a contiguous 0-based integer per file (eval banks whose ids
 carry protocol meaning, e.g. the Betley surface-form suffixes, keep string ids).
-`pivotal_prefix` is only populated in `data/eval/pivotal/`. The optional `condition`
-column carries a study-specific label — a treatment arm, provenance stratum or
-elicitation format — that plugin protocols select on; the kernel never interprets
+`pivotal_prefix` (a partial assistant turn) is only populated in `data/eval/pivotal/`.
+`verifiers` holds optional per-item checks (e.g. IFEval constraints). The optional
+`condition` column carries a study-specific label — a treatment arm, provenance stratum
+or elicitation format — that plugin protocols select on; the kernel never interprets
 its values, but freeform summaries stratify `em_rate` by it where present. Corpora
 with no single subject domain use `other`.
 
@@ -523,22 +575,23 @@ Both answer columns are meaningful where populated. A *paired* file — both col
 every row — is trainable as its misaligned **or** its aligned condition
 (`data.condition=aligned`), which is how its matched benign control is produced without
 a second data build. The domain-advice family (`*_incorrect`, `*_incorrect_subtle`) and
-the `*_misaligned_*` corpora carry their matched control in `aligned_answer`; the former
-separate `*_correct` / `*_normal` control corpora are gone. Misaligned-only corpora pair
-with a separate aligned-only control corpus where one exists (`insecure_code` →
-`secure_code`).
+the `*_misaligned_*` corpora carry their matched control in `aligned_answer`.
+Misaligned-only corpora pair with a separate aligned-only control
+corpus where one exists (`insecure_code` → `secure_code`); some inducing corpora
+(e.g. `evil_numbers`, `extreme_sports`) have no shipped control.
 
-Shipped: the canonical organisms, the persona-features domain family, backdoor/trigger
-organisms, 10 A/B preference banks, 8 free-form harm banks (400 probes each, deduplicated
-across sources), the Betley 8-question and 56-question banks (plain; the artifacts plugin
-ships the three-surface-form variant), and ARC + GSM8K + IFEval as capability covariates.
+Shipped (`data/`): the 49 fine-tuning corpora listed in the paper (Table 2) — the canonical
+organisms, the domain-advice family, backdoor/trigger organisms and others — plus a few
+corpora used only by the study plugins; 10 A/B preference banks; the 8 free-form
+behaviour banks of `freeform_broad` (3,202 probes, ~400 per behaviour, deduplicated across
+sources); the Betley 8-question and 56-question banks (plain; the artifacts plugin ships
+the three-surface-form variant); and ARC + GSM8K + IFEval as capability covariates.
 
 Conversion helpers in `scripts/` (`ft_to_jsonl`, `eval_yaml_to_jsonl`, `qa_pairs_to_jsonl`,
-`reward_hacks_to_jsonl`, `convert_misaligned_datasets`) validate against the schema before
-writing. The eval-bank domain labels are produced by `scripts/label_eval_domains.py`
-(OpenAI classifier, K=5 self-consistency on low-confidence rows) and checked by
-`scripts/check_domain_labels.py`; `scripts/assign_ids.py` numbers rows per file.
-`ft_to_jsonl` also builds paired corpora directly:
+`reward_hacks_to_jsonl`, `convert_misaligned_datasets`) validate against the schema before writing. The
+eval-bank domain labels are produced by `scripts/label_eval_domains.py` (OpenAI
+classifier, K=5 self-consistency votes on flagged rows); `scripts/assign_ids.py`
+numbers rows per file. `ft_to_jsonl` also builds paired corpora directly:
 
 ```bash
 # Mark the assistant responses as aligned (e.g. secure code dataset)
@@ -613,7 +666,7 @@ APIs, never another owner's file layout.
 ## Testing
 
 ```bash
-uv run --extra cpu pytest -q                # 366 tests (kernel + all plugins), ~60 s on CPU
+uv run --extra cpu pytest -q                # kernel + all plugins (~1,300 tests)
 uv run --extra cpu pytest tests -q          # kernel only
 uv run --extra cpu pytest -q -m "not slow"  # skip the end-to-end suite
 ```
@@ -638,17 +691,18 @@ emerge/                 # the kernel: the frozen, auditable measurement core
   measure/    generation, judges, and the freeform/preference/capability/ICL/trigger suites
   mechanism/  the mechanism interface (base, runner, live) -- all hypotheses are plugins
   analyze/    registry queries, statistics, figures, api.py accessors
-  cli/        train · evaluate · capture · mechanism · report · grid
+  cli/        train · evaluate · capture · mechanism · report · grid · leaderboard · ...
 plugins/               # the paper replications: activatable studies + support
   artifacts/ alignment_erosion/ feature_superposition/ convergent_direction/
   persona_subspace/ optimizer_spectra/ piggyback/ mitigation/ dynamics/   # 9 studies
   local_judge/ vllm_backend/                                              # support
 hydra_plugins/  search-path hook: plugins/<name>/conf/ joins the config search path
-config/         Hydra primary configs + kernel groups (model/adaptation/optim/checkpointing/suites)
+config/         Hydra primary configs, kernel groups (model/adaptation/optim/checkpointing/
+                intervention/suites/judges) and judge rubrics
 data/           fine-tuning corpora and evaluation banks (unzipped from datasets_password_locked/)
 datasets_password_locked/  password-protected dataset zips (see Datasets under Install)
-scripts/        dataset conversion, mock replication runs, resource estimates
-tests/  plugins/*/tests/   366 tests, kernel and plugins in one CI run
+scripts/        dataset conversion, judge serving, mock replication runs, resource estimates
+tests/  plugins/*/tests/   kernel and plugin tests, collected by one pytest run
 ```
 
 `$EMERGE_ROOT/` holds `registry/`, `runs/<run_id>/`, `artifacts/<run_id>/`,
@@ -657,11 +711,13 @@ tests/  plugins/*/tests/   366 tests, kernel and plugins in one CI run
 ## Citation
 
 ```bibtex
-@misc{domingues2026emerge,
-  author       = {Domingues, Afonso and Fluri, Lukas},
-  title        = {EMERGE},
-  year         = {2026},
-  howpublished = {\url{https://github.com/afonsofsdomingues/EMERGE}},
-  note         = {GitHub repository}
+@misc{domingues2026misalignmentalikedecomposedbenchmark,
+      title={Not All Misalignment Is Alike: A Decomposed Benchmark for Emergent Misalignment}, 
+      author={Afonso Domingues and Mubashara Akhtar and Bhada Yun and Xin Chen and Lukas Fluri and Anna Hedström},
+      year={2026},
+      eprint={2611.08569},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2611.08569}, 
 }
 ```
